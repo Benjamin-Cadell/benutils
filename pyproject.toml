@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "benutils"
+authors = [
+    { name = "Benjamin Cadell", email = "bcadell01@qub.ac.uk" },
+]
+description = "Utility functions for general use."
+requires-python = ">=3.8"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["utility"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX",
+]
+dependencies = [
+    "numpy",
+    "matplotlib",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/Benjamin-Cadell/benutils"
+
+[tool.setuptools]
+py-modules = ["benutils"]
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "dirty-tag"
+tag_regex = "^v(?P<version>\\d+\\.\\d+\\.\\d+(?:(?:a|b|rc)\\d+)?)$"
