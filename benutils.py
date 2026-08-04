@@ -13,10 +13,17 @@ opts = {
     "axes.titlesize": 16,
 }
 
+def _show_legend_if_needed(ax):
+    """Show the legend if any of the lines have labels."""
+    handles, labels = ax.get_legend_handles_labels()
+    if any(label for label in labels):
+        ax.legend()
+
 def plot(*args, **kwargs):
     """Plot data using the default style and display the figure."""
     with plt.rc_context(opts):
         plt.plot(*args, **kwargs)
+        _show_legend_if_needed(plt.gca())
         plt.show()
 
 
@@ -24,14 +31,15 @@ def scatter(*args, **kwargs):
     """Create a scatter plot using the default style."""
     with plt.rc_context(opts):
         plt.scatter(*args, **kwargs)
+        _show_legend_if_needed(plt.gca())
         plt.show()
 
 def errorbar(*args, **kwargs):
     """Create an error-bar plot using the default style."""
     with plt.rc_context(opts):
         plt.errorbar(*args, **kwargs)
+        _show_legend_if_needed(plt.gca())
         plt.show()
-
 
 class Plot:
     """A small wrapper around a Matplotlib figure and axes."""
@@ -53,6 +61,7 @@ class Plot:
 
     def show(self, *, close=True):
         """Display the figure and optionally close it afterwards."""
+        _show_legend_if_needed(self.ax)
         plt.show()
 
         if close:
