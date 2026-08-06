@@ -1,7 +1,8 @@
 #%% Matplotlib utilities for plotting with a consistent style.
 import matplotlib.pyplot as plt
+import warnings
 
-opts = {
+latex_opts = {
     "figure.figsize": (10, 6),
     "text.usetex": True,
     "text.latex.preamble": r"\usepackage{amsmath}",
@@ -13,6 +14,38 @@ opts = {
     "ytick.labelsize": 14,
     "axes.titlesize": 16,
 }
+
+fallback_opts = {
+    "figure.figsize": (10, 6),
+    "axes.labelsize": 14,
+    "font.size": 14,
+    "legend.fontsize": 14,
+    "xtick.labelsize": 14,
+    "ytick.labelsize": 14,
+    "axes.titlesize": 16,
+}
+
+# Try and initialise LaTeX rendering, otherwise go to fallback, either way,
+# "opts" is generated and can be modified by the user.
+fig = None
+try:
+    with plt.rc_context(latex_opts):
+        fig, ax = plt.subplots()
+        ax.set_xlabel(r"$\alpha + \beta$")
+        fig.canvas.draw()
+except Exception as exc:
+    warnings.warn(
+        f"Failed to initialize LaTeX rendering: {exc}. "
+        "Falling back to Matplotlib's default text rendering.",
+        RuntimeWarning,
+        stacklevel=2,
+    )
+    opts = fallback_opts
+else:
+    opts = latex_opts
+finally:
+    if fig is not None:
+        plt.close(fig)
 
 def _show_legend_if_needed(ax):
     """Show the legend if any of the lines have labels."""
