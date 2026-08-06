@@ -1,3 +1,4 @@
+#%% Matplotlib utilities for plotting with a consistent style.
 import matplotlib.pyplot as plt
 
 opts = {
@@ -26,7 +27,6 @@ def plot(*args, **kwargs):
         _show_legend_if_needed(plt.gca())
         plt.show()
 
-
 def scatter(*args, **kwargs):
     """Create a scatter plot using the default style."""
     with plt.rc_context(opts):
@@ -42,7 +42,10 @@ def errorbar(*args, **kwargs):
         plt.show()
 
 class Plot:
-    """A small wrapper around a Matplotlib figure and axes."""
+    """
+    A class for multiple plots with a style and use similar to that of pyplot.
+    All unknown methods are directly passed to the axes object.
+    """
 
     def __init__(self, *args, **kwargs):
         self._context = plt.rc_context(opts)
@@ -74,6 +77,7 @@ class Plot:
             self._context.__exit__(None, None, None)
             self._closed = True
 
+    # Use the same enter/exit interface as plt.rc_context to allow usage with the 'with' statement.
     def __enter__(self):
         return self
 
