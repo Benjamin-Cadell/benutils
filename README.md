@@ -28,7 +28,7 @@ And then follow the steps above to install the package.
 Tutorial and Usage
 ==================
 
-Not a full tutorial, just a basical explainer on the main use.
+Not a full tutorial, just a basic explanation on the main use.
 
 Matplotlib functions
 --------------------
