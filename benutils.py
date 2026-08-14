@@ -1,6 +1,7 @@
 #%% Matplotlib utilities for plotting with a consistent style.
 import matplotlib.pyplot as plt
 import warnings
+import functools
 
 latex_opts = {
     "figure.figsize": (10, 6),
@@ -53,25 +54,59 @@ def _show_legend_if_needed(ax):
     if any(label for label in labels):
         ax.legend()
 
-def plot(*args, **kwargs):
+
+def more_ax_kwargs(method):
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        figsize = kwargs.pop("figsize", opts["figure.figsize"])
+        kwargs.setdefault("fig_ax", plt.subplots(figsize=figsize))
+
+        fig, ax = kwargs["fig_ax"]
+
+        # Pull out kwargs intended for ax.set_* methods
+        set_kwargs = {
+            key[4:]: kwargs.pop(key)
+            for key in list(kwargs)
+            if key.startswith("set_")
+        }
+
+        for name, value in set_kwargs.items():
+            setter = getattr(ax, f"set_{name}")
+            if isinstance(value, dict):
+                setter(**value)
+            elif isinstance(value, tuple):
+                setter(*value)
+            else:
+                setter(value)
+
+        return method(*args, **kwargs)
+    return wrapper
+
+@more_ax_kwargs
+def plot(*args, fig_ax, **kwargs):
     """Plot data using the default style and display the figure."""
     with plt.rc_context(opts):
-        plt.plot(*args, **kwargs)
-        _show_legend_if_needed(plt.gca())
+        fig, ax = fig_ax
+        ax.plot(*args, **kwargs)
+        _show_legend_if_needed(ax)
         plt.show()
 
-def scatter(*args, **kwargs):
+@more_ax_kwargs
+def scatter(*args, fig_ax, **kwargs):
     """Create a scatter plot using the default style."""
     with plt.rc_context(opts):
-        plt.scatter(*args, **kwargs)
-        _show_legend_if_needed(plt.gca())
+        fig, ax = fig_ax
+        ax.scatter(*args, **kwargs)
+        _show_legend_if_needed(ax)
         plt.show()
 
-def errorbar(*args, **kwargs):
+@more_ax_kwargs
+def errorbar(*args, fig_ax, **kwargs):
     """Create an error-bar plot using the default style."""
     with plt.rc_context(opts):
-        plt.errorbar(*args, **kwargs)
-        _show_legend_if_needed(plt.gca())
+        fig, ax = fig_ax
+        ax.errorbar(*args, **kwargs)
+        _show_legend_if_needed(ax)
         plt.show()
 
 class Plot:
