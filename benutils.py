@@ -59,11 +59,22 @@ def more_ax_kwargs(method):
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
         figsize = kwargs.pop("figsize", opts["figure.figsize"])
-        kwargs.setdefault("fig_ax", plt.subplots(figsize=figsize))
+
+        # Explicit fig_ax takes precedence.
+        if kwargs.get("fig_ax") is None:
+            if plt.get_fignums():
+                # Reuse the currently active figure/axes.
+                fig = plt.gcf()
+                ax = plt.gca()
+            else:
+                # Nothing open: make a new figure.
+                fig, ax = plt.subplots(figsize=figsize)
+
+            kwargs["fig_ax"] = (fig, ax)
 
         fig, ax = kwargs["fig_ax"]
 
-        # Pull out kwargs intended for ax.set_* methods
+        # Pull out kwargs intended for ax.set_* methods.
         set_kwargs = {
             key[4:]: kwargs.pop(key)
             for key in list(kwargs)
@@ -80,34 +91,41 @@ def more_ax_kwargs(method):
                 setter(value)
 
         return method(*args, **kwargs)
+
     return wrapper
 
 @more_ax_kwargs
-def plot(*args, fig_ax, **kwargs):
+def plot(*args, fig_ax=None, show=True, **kwargs):
     """Plot data using the default style and display the figure."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.plot(*args, **kwargs)
         _show_legend_if_needed(ax)
-        plt.show()
+        if show:
+            plt.show()
+            plt.close(fig)
 
 @more_ax_kwargs
-def scatter(*args, fig_ax, **kwargs):
+def scatter(*args, fig_ax=None, show=True, **kwargs):
     """Create a scatter plot using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.scatter(*args, **kwargs)
         _show_legend_if_needed(ax)
-        plt.show()
+        if show:
+            plt.show()
+            plt.close(fig)
 
 @more_ax_kwargs
-def errorbar(*args, fig_ax, **kwargs):
+def errorbar(*args, fig_ax=None, show=True, **kwargs):
     """Create an error-bar plot using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.errorbar(*args, **kwargs)
         _show_legend_if_needed(ax)
-        plt.show()
+        if show:
+            plt.show()
+            plt.close(fig)
 
 class Plot:
     """
