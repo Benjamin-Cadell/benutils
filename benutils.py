@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import warnings
 import functools
 
-latex_opts = {
+opts = {
     "figure.figsize": (10, 6),
     "text.usetex": True,
     "text.latex.preamble": r"\usepackage{amsmath}",
@@ -16,21 +16,11 @@ latex_opts = {
     "axes.titlesize": 16,
 }
 
-fallback_opts = {
-    "figure.figsize": (10, 6),
-    "axes.labelsize": 14,
-    "font.size": 14,
-    "legend.fontsize": 14,
-    "xtick.labelsize": 14,
-    "ytick.labelsize": 14,
-    "axes.titlesize": 16,
-}
-
-# Try and initialise LaTeX rendering, otherwise go to fallback, either way,
-# "opts" is generated and can be modified by the user.
+# Try to initialise LaTeX rendering. If it fails, remove the LaTeX-specific
+# options while preserving the rest of the plotting style.
 fig = None
 try:
-    with plt.rc_context(latex_opts):
+    with plt.rc_context(opts):
         fig, ax = plt.subplots()
         ax.set_xlabel(r"$\alpha + \beta$")
         fig.canvas.draw()
@@ -41,9 +31,8 @@ except Exception as exc:
         RuntimeWarning,
         stacklevel=2,
     )
-    opts = fallback_opts
-else:
-    opts = latex_opts
+    for key in ("text.usetex", "text.latex.preamble", "font.family"):
+        opts.pop(key)
 finally:
     if fig is not None:
         plt.close(fig)
@@ -54,7 +43,7 @@ def _show_legend_if_needed(ax):
     if any(label for label in labels):
         ax.legend()
 
-def more_ax_kwargs(method):
+def _more_ax_kwargs(method):
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
         figsize = kwargs.pop("figsize", opts["figure.figsize"])
@@ -81,7 +70,7 @@ def more_ax_kwargs(method):
 
     return wrapper
 
-@more_ax_kwargs
+@_more_ax_kwargs
 def plot(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
     """Plot data using the default style and display the figure."""
     with plt.rc_context(opts):
@@ -93,7 +82,7 @@ def plot(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
             plt.show()
             plt.close(fig)
 
-@more_ax_kwargs
+@_more_ax_kwargs
 def scatter(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
     """Create a scatter plot using the default style."""
     with plt.rc_context(opts):
@@ -105,7 +94,7 @@ def scatter(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
             plt.show()
             plt.close(fig)
 
-@more_ax_kwargs
+@_more_ax_kwargs
 def errorbar(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
     """Create an error-bar plot using the default style."""
     with plt.rc_context(opts):
