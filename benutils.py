@@ -70,6 +70,11 @@ def _more_ax_kwargs(method):
 
     return wrapper
 
+def _show_and_close(fig, show=True):
+    if show:
+        plt.show()
+        plt.close(fig)
+
 @_more_ax_kwargs
 def plot(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
     """Plot data using the default style and display the figure."""
@@ -78,9 +83,7 @@ def plot(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
         ax.plot(*args, **kwargs)
         ax.set(**_ax_set)
         _show_legend_if_needed(ax)
-        if show:
-            plt.show()
-            plt.close(fig)
+        _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
 def scatter(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
@@ -90,9 +93,7 @@ def scatter(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
         ax.scatter(*args, **kwargs)
         ax.set(**_ax_set)
         _show_legend_if_needed(ax)
-        if show:
-            plt.show()
-            plt.close(fig)
+        _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
 def errorbar(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
@@ -102,9 +103,7 @@ def errorbar(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
         ax.errorbar(*args, **kwargs)
         ax.set(**_ax_set)
         _show_legend_if_needed(ax)
-        if show:
-            plt.show()
-            plt.close(fig)
+        _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
 def hist(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
@@ -114,9 +113,7 @@ def hist(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
         ax.hist(*args, **kwargs)
         ax.set(**_ax_set)
         _show_legend_if_needed(ax)
-        if show:
-            plt.show()
-            plt.close(fig)
+        _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
 def imshow(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
@@ -126,9 +123,7 @@ def imshow(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
         ax.imshow(*args, **kwargs)
         ax.set(**_ax_set)
         _show_legend_if_needed(ax)
-        if show:
-            plt.show()
-            plt.close(fig)
+        _show_and_close(fig, show=show)
 
 class Plot:
     """
