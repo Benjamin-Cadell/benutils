@@ -106,6 +106,30 @@ def errorbar(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
             plt.show()
             plt.close(fig)
 
+@_more_ax_kwargs
+def hist(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
+    """Create a histogram using the default style."""
+    with plt.rc_context(opts):
+        fig, ax = fig_ax
+        ax.hist(*args, **kwargs)
+        ax.set(**_ax_set)
+        _show_legend_if_needed(ax)
+        if show:
+            plt.show()
+            plt.close(fig)
+
+@_more_ax_kwargs
+def imshow(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
+    """Display data as an image using the default style."""
+    with plt.rc_context(opts):
+        fig, ax = fig_ax
+        ax.imshow(*args, **kwargs)
+        ax.set(**_ax_set)
+        _show_legend_if_needed(ax)
+        if show:
+            plt.show()
+            plt.close(fig)
+
 class Plot:
     """
     A class for multiple plots with a style and use similar to that of pyplot.

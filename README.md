@@ -48,17 +48,9 @@ The default matplotlib figure options are:
         "axes.titlesize": 16,
     }
 
-On import, the code will attempt to inject these to matplotlib, but if they fail (such as if latex is not installed), then the default is:
-
-    opts = {
-            "figure.figsize": (10, 6),
-            "axes.labelsize": 14,
-            "font.size": 14,
-            "legend.fontsize": 14,
-            "xtick.labelsize": 14,
-            "ytick.labelsize": 14,
-            "axes.titlesize": 16,
-        }
+On import, the code will try to initialise Matplotlib with these options.
+If LaTeX rendering fails (for example, because LaTeX is not installed), the `text.usetex`, `text.latex.preamble`, and `font.family` entries are removed from `opts`.
+The remaining plotting style is preserved and Matplotlib's default text rendering is used.
 
 They are applied to matplotlib temporary for each plotting call, and then reverted to the state it was in before.
 
@@ -84,8 +76,25 @@ Simply quick plot with benutils.plot like so:
 
     # To do a standard plot with standard options. The plot is shown immediately.
     benutils.plot(x,y)
-    
-I've also added benutils.errorbar() and benutils.scatter() as they are very common. For more complex calls, use the Plot class:
+
+Keyword arguments for the underlying plotting method can be passed normally.
+Axes properties can also be passed together using the `set` keyword; its contents are forwarded to `ax.set()` after plotting:
+
+    benutils.plot(
+        x,
+        y,
+        color="tab:blue",
+        set={
+            "xlabel": "x",
+            "ylabel": "y",
+            "title": "A quick plot",
+            "xlim": (0, 10),
+        },
+    )
+
+I've also added benutils.errorbar(), benutils.scatter(), benutils.hist(), and
+benutils.imshow() as they are very common. For more complex calls, use the Plot
+class:
 
     plot = benutils.Plot() # arguments to the init are passed to plt.subplots()
 
