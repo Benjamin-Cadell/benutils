@@ -60,12 +60,6 @@ def _more_ax_kwargs(method):
 
             kwargs["fig_ax"] = (fig, ax)
 
-        fig, ax = kwargs["fig_ax"]
-
-        # Pull out kwargs intended for ax.set()
-        set_kwargs = kwargs.pop("set", None)
-        kwargs["_ax_set"] = set_kwargs if set_kwargs is not None else {}
-
         return method(*args, **kwargs)
 
     return wrapper
@@ -76,52 +70,52 @@ def _show_and_close(fig, show=True):
         plt.close(fig)
 
 @_more_ax_kwargs
-def plot(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
+def plot(*args, fig_ax=None, show=True, set=None, **kwargs):
     """Plot data using the default style and display the figure."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.plot(*args, **kwargs)
-        ax.set(**_ax_set)
+        ax.set(**(set or {}))
         _show_legend_if_needed(ax)
         _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
-def scatter(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
+def scatter(*args, fig_ax=None, show=True, set=None, **kwargs):
     """Create a scatter plot using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.scatter(*args, **kwargs)
-        ax.set(**_ax_set)
+        ax.set(**(set or {}))
         _show_legend_if_needed(ax)
         _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
-def errorbar(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
+def errorbar(*args, fig_ax=None, show=True, set=None, **kwargs):
     """Create an error-bar plot using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.errorbar(*args, **kwargs)
-        ax.set(**_ax_set)
+        ax.set(**(set or {}))
         _show_legend_if_needed(ax)
         _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
-def hist(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
+def hist(*args, fig_ax=None, show=True, set=None, **kwargs):
     """Create a histogram using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.hist(*args, **kwargs)
-        ax.set(**_ax_set)
+        ax.set(**(set or {}))
         _show_legend_if_needed(ax)
         _show_and_close(fig, show=show)
 
 @_more_ax_kwargs
-def imshow(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
+def imshow(*args, fig_ax=None, show=True, set=None, **kwargs):
     """Display data as an image using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.imshow(*args, **kwargs)
-        ax.set(**_ax_set)
+        ax.set(**(set or {}))
         _show_legend_if_needed(ax)
         _show_and_close(fig, show=show)
 
