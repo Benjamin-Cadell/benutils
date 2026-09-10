@@ -36,7 +36,7 @@ try:
         fig.canvas.draw()
 except Exception as exc:
     warnings.warn(
-        f"Failed to initialize LaTeX rendering: {exc}. "
+        f"Failed to initialize/import LaTeX rendering: {exc}. "
         "Falling back to Matplotlib's default text rendering.",
         RuntimeWarning,
         stacklevel=2,
@@ -53,7 +53,6 @@ def _show_legend_if_needed(ax):
     handles, labels = ax.get_legend_handles_labels()
     if any(label for label in labels):
         ax.legend()
-
 
 def more_ax_kwargs(method):
     @functools.wraps(method)
@@ -74,54 +73,45 @@ def more_ax_kwargs(method):
 
         fig, ax = kwargs["fig_ax"]
 
-        # Pull out kwargs intended for ax.set_* methods.
-        set_kwargs = {
-            key[4:]: kwargs.pop(key)
-            for key in list(kwargs)
-            if key.startswith("set_")
-        }
-
-        for name, value in set_kwargs.items():
-            setter = getattr(ax, f"set_{name}")
-            if isinstance(value, dict):
-                setter(**value)
-            elif isinstance(value, tuple):
-                setter(*value)
-            else:
-                setter(value)
+        # Pull out kwargs intended for ax.set()
+        set_kwargs = kwargs.pop("set", None)
+        kwargs["_ax_set"] = set_kwargs if set_kwargs is not None else {}
 
         return method(*args, **kwargs)
 
     return wrapper
 
 @more_ax_kwargs
-def plot(*args, fig_ax=None, show=True, **kwargs):
+def plot(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
     """Plot data using the default style and display the figure."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.plot(*args, **kwargs)
+        ax.set(**_ax_set)
         _show_legend_if_needed(ax)
         if show:
             plt.show()
             plt.close(fig)
 
 @more_ax_kwargs
-def scatter(*args, fig_ax=None, show=True, **kwargs):
+def scatter(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
     """Create a scatter plot using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.scatter(*args, **kwargs)
+        ax.set(**_ax_set)
         _show_legend_if_needed(ax)
         if show:
             plt.show()
             plt.close(fig)
 
 @more_ax_kwargs
-def errorbar(*args, fig_ax=None, show=True, **kwargs):
+def errorbar(*args, fig_ax=None, show=True, _ax_set=None, **kwargs):
     """Create an error-bar plot using the default style."""
     with plt.rc_context(opts):
         fig, ax = fig_ax
         ax.errorbar(*args, **kwargs)
+        ax.set(**_ax_set)
         _show_legend_if_needed(ax)
         if show:
             plt.show()
