@@ -1,7 +1,6 @@
 #%% Matplotlib utilities for plotting with a consistent style.
 import matplotlib.pyplot as plt
 import warnings
-import functools
 
 opts = {
     "figure.figsize": (10, 6),
@@ -43,81 +42,46 @@ def _show_legend_if_needed(ax):
     if any(label for label in labels):
         ax.legend()
 
-def _more_ax_kwargs(method):
-    @functools.wraps(method)
-    def wrapper(*args, **kwargs):
-        figsize = kwargs.pop("figsize", opts["figure.figsize"])
-
-        # Explicit fig_ax takes precedence.
-        if kwargs.get("fig_ax") is None:
-            if plt.get_fignums():
-                # Reuse the currently active figure/axes.
-                fig = plt.gcf()
-                ax = plt.gca()
-            else:
-                # Nothing open: make a new figure.
-                fig, ax = plt.subplots(figsize=figsize)
-
-            kwargs["fig_ax"] = (fig, ax)
-
-        return method(*args, **kwargs)
-
-    return wrapper
-
 def _show_and_close(fig, show=True):
     if show:
         plt.show()
         plt.close(fig)
 
-@_more_ax_kwargs
-def plot(*args, fig_ax=None, show=True, set=None, **kwargs):
+def _quick_plot(method, *args, fig_ax=None, figsize=None, show=True, set=None, **kwargs):
+    if fig_ax is None:
+        if plt.get_fignums():
+            fig = plt.gcf()
+            ax = plt.gca()
+        else:
+            fig, ax = plt.subplots(figsize=figsize or opts["figure.figsize"])
+    else:
+        fig, ax = fig_ax
+
+    with plt.rc_context(opts):
+        getattr(ax, method)(*args, **kwargs)
+        ax.set(**(set or {}))
+        _show_legend_if_needed(ax)
+        _show_and_close(fig, show=show)
+
+def plot(*args, fig_ax=None, figsize=None, show=True, set=None, **kwargs):
     """Plot data using the default style and display the figure."""
-    with plt.rc_context(opts):
-        fig, ax = fig_ax
-        ax.plot(*args, **kwargs)
-        ax.set(**(set or {}))
-        _show_legend_if_needed(ax)
-        _show_and_close(fig, show=show)
+    return _quick_plot("plot", *args, fig_ax=fig_ax, figsize=figsize, show=show, set=set, **kwargs)
 
-@_more_ax_kwargs
-def scatter(*args, fig_ax=None, show=True, set=None, **kwargs):
+def scatter(*args, fig_ax=None, figsize=None, show=True, set=None, **kwargs):
     """Create a scatter plot using the default style."""
-    with plt.rc_context(opts):
-        fig, ax = fig_ax
-        ax.scatter(*args, **kwargs)
-        ax.set(**(set or {}))
-        _show_legend_if_needed(ax)
-        _show_and_close(fig, show=show)
+    return _quick_plot("scatter", *args, fig_ax=fig_ax, figsize=figsize, show=show, set=set, **kwargs)
 
-@_more_ax_kwargs
-def errorbar(*args, fig_ax=None, show=True, set=None, **kwargs):
+def errorbar(*args, fig_ax=None, figsize=None, show=True, set=None, **kwargs):
     """Create an error-bar plot using the default style."""
-    with plt.rc_context(opts):
-        fig, ax = fig_ax
-        ax.errorbar(*args, **kwargs)
-        ax.set(**(set or {}))
-        _show_legend_if_needed(ax)
-        _show_and_close(fig, show=show)
+    return _quick_plot("errorbar", *args, fig_ax=fig_ax, figsize=figsize, show=show, set=set, **kwargs)
 
-@_more_ax_kwargs
-def hist(*args, fig_ax=None, show=True, set=None, **kwargs):
+def hist(*args, fig_ax=None, figsize=None, show=True, set=None, **kwargs):
     """Create a histogram using the default style."""
-    with plt.rc_context(opts):
-        fig, ax = fig_ax
-        ax.hist(*args, **kwargs)
-        ax.set(**(set or {}))
-        _show_legend_if_needed(ax)
-        _show_and_close(fig, show=show)
+    return _quick_plot("hist", *args, fig_ax=fig_ax, figsize=figsize, show=show, set=set, **kwargs)
 
-@_more_ax_kwargs
-def imshow(*args, fig_ax=None, show=True, set=None, **kwargs):
+def imshow(*args, fig_ax=None, figsize=None, show=True, set=None, **kwargs):
     """Display data as an image using the default style."""
-    with plt.rc_context(opts):
-        fig, ax = fig_ax
-        ax.imshow(*args, **kwargs)
-        ax.set(**(set or {}))
-        _show_legend_if_needed(ax)
-        _show_and_close(fig, show=show)
+    return _quick_plot("imshow", *args, fig_ax=fig_ax, figsize=figsize, show=show, set=set, **kwargs)
 
 class Plot:
     """
