@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import warnings
 from types import TracebackType
 from typing import Any, Dict, Optional, Tuple, Type
-
+import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
@@ -157,6 +157,41 @@ def scatter(
         Keyword arguments passed to Axes.scatter().
     """
     return _quick_plot("scatter", *args, fig_ax=fig_ax, figsize=figsize, show=show, set=set, **kwargs)
+
+def scatter1d(
+    *args: Any, fig_ax: Optional[Tuple[Figure, Axes]] = None,
+    figsize: Optional[Tuple[float, float]] = None, show: bool = True,
+    set: Optional[Dict[str, Any]] = None, **kwargs: Any,
+) -> None:
+    """Create a 1D scatter plot using the default style.
+    Same as scatter but the x-axis is specifically set 
+    to np.arange(len(y)) where y is the input data.
+    Similar to how plt.plot(y) automatically sets the 
+    x-axis to np.arange(len(y)).
+
+    Parameters:
+    *args : Any
+        Point coordinates passed to Axes.scatter(). 
+        In 1D scatter, only y-coordinates are expected.
+    fig_ax : tuple of (Figure, Axes), optional
+        Figure and axes to use. Defaults to the current axes, or new axes
+        if no figure is open.
+    figsize : tuple of float, optional
+        Width and height in inches when creating a figure. Defaults to
+        opts["figure.figsize"]. Ignored when reusing a figure.
+    show : bool, optional
+        Whether to display open figures and close the plotted figure.
+        Defaults to True. Use False to keep the figure open for further edits.
+    set : dict of str to Any, optional
+        Axes properties passed to ax.set(), such as xlabel or title.
+    **kwargs : Any
+        Keyword arguments passed to Axes.scatter().
+    """
+    if len(args) == 1:
+        y = args[0]
+        args = (np.arange(len(y)), y)
+    return _quick_plot("scatter", *args, fig_ax=fig_ax, figsize=figsize, show=show, set=set, **kwargs)
+
 
 def errorbar(
     *args: Any, fig_ax: Optional[Tuple[Figure, Axes]] = None,
